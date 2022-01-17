@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of } from 'rxjs';
+import { catchError, Observable, of, tap } from 'rxjs';
 import { Hero } from './hero';
 import { MessageService } from './message.service';
 
@@ -8,28 +8,46 @@ import { MessageService } from './message.service';
   providedIn: 'root'
 })
 export class HeroService {
-  private heroesUrl = 'api/heroe/';  // URL to web api
+  private heroesUrl = 'api/heroes/';  // URL to web api
 
   constructor(private http: HttpClient, private messageService: MessageService) { }
 
   getHeroes(): Observable<Hero[]> {
-    this.log('fetched heroes');
     return this.http.get<Hero[]>(this.heroesUrl).pipe(
-      catchError( (err,caught) => {
-        console.error(err, caught);
-        this.log("Error al acceder a los heroes");
-        return of([ { id: 0, name: 'No se ha podido acceder a los heroes'} ]);
-      } )
+      tap(_ => this.log('fetched heroes')),
+      catchError(this.handleError<Hero[]>('getHeroes', []))
     );
   }
 
   getHero(id: number): Observable<Hero> {
-    this.log(`fetched hero id=${id}`);
-    return this.http.get<Hero>(this.heroesUrl + id);
+    return this.http.get<Hero>(this.heroesUrl + id).pipe(
+      tap(_ => this.log(`fetched hero id=${id}`)),
+      catchError(this.handleError<Hero>(`getHero id=${id}`))
+    );
   }
 
   /** Log a HeroService message with the MessageService */
   private log(message: string) {
     this.messageService.add(`HeroService: ${message}`);
+  }
+
+  /**
+ * Handle Http operation that failed.
+ * Let the app continue.
+ * @param operation - name of the operation that failed
+ * @param result - optional value to return as the observable result
+ */
+  private handleError<T>(operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+
+      // TODO: send the error to remote logging infrastructure
+      console.error(error); // log to console instead
+
+      // TODO: better job of transforming error for user consumption
+      this.log(`${operation} failed: ${error.message}`);
+
+      // Let the app keep running by returning an empty result.
+      return of(result as T);
+    };
   }
 }
