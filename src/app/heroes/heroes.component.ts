@@ -39,6 +39,7 @@ export class HeroesComponent implements OnInit {
         this.heroes.push(hero);
       });
   }
+<<<<<<< HEAD
   delete(hero: Hero): void {
     this.heroes = this.heroes.filter(h => h !== hero);
 
@@ -46,5 +47,12 @@ export class HeroesComponent implements OnInit {
 
     //this.heroService.deleteHero(hero.id).subscribe(
       //()=> this.heroes = this.heroes.filter(h => h !== hero));
+=======
+
+  delete(hero: Hero): void {
+    this.heroService.deleteHero(hero.id).subscribe(
+      () => this.heroes = this.heroes.filter(h => h !== hero)
+    );
+>>>>>>> f012094b71e2098dd295013387f94303ad458937
   }
 }
