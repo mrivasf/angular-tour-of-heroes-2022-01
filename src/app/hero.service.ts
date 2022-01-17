@@ -10,15 +10,20 @@ import { MessageService } from './message.service';
 export class HeroService {
   private heroesUrl = 'api/heroes/';  // URL to web api
 
-  constructor(private http: HttpClient, private messageService: MessageService) {}
+  constructor(private http: HttpClient, private messageService: MessageService) { }
 
   getHeroes(): Observable<Hero[]> {
-    this.messageService.add('HeroService: fetched heroes');
+    this.log('fetched heroes');
     return this.http.get<Hero[]>(this.heroesUrl);
   }
 
   getHero(id: number): Observable<Hero> {
-    this.messageService.add(`HeroService: fetched hero id=${id}`);
+    this.log(`fetched hero id=${id}`);
     return this.http.get<Hero>(this.heroesUrl + id);
+  }
+
+  /** Log a HeroService message with the MessageService */
+  private log(message: string) {
+    this.messageService.add(`HeroService: ${message}`);
   }
 }
