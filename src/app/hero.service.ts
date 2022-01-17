@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { catchError, Observable, of } from 'rxjs';
 import { Hero } from './hero';
 import { MessageService } from './message.service';
 
@@ -8,13 +8,19 @@ import { MessageService } from './message.service';
   providedIn: 'root'
 })
 export class HeroService {
-  private heroesUrl = 'api/heroes/';  // URL to web api
+  private heroesUrl = 'api/heroe/';  // URL to web api
 
   constructor(private http: HttpClient, private messageService: MessageService) { }
 
   getHeroes(): Observable<Hero[]> {
     this.log('fetched heroes');
-    return this.http.get<Hero[]>(this.heroesUrl);
+    return this.http.get<Hero[]>(this.heroesUrl).pipe(
+      catchError( (err,caught) => {
+        console.error(err, caught);
+        this.log("Error al acceder a los heroes");
+        return of([ { id: 0, name: 'No se ha podido acceder a los heroes'} ]);
+      } )
+    );
   }
 
   getHero(id: number): Observable<Hero> {
